@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:pillie/app/auth/screens/login_page.dart';
 import 'package:pillie/app/auth/screens/register_page.dart';
 import 'package:pillie/app/home/screens/pill_list_page.dart';
+import 'package:pillie/app/profile/screens/edit_profile.dart';
+import 'package:pillie/databases/user_database.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthGate extends StatefulWidget {
@@ -32,9 +34,26 @@ class _AuthGateState extends State<AuthGate> {
           );
         }
         final session = snapshot.hasData ? snapshot.data!.session : null;
-
+        // TODO: Implement error handling
         if (session != null) {
-          return const PillListPage();
+          return FutureBuilder(
+              future: UserDatabase().getUser(session.user.id),
+              builder: (context, userSnapshot) {
+                if (userSnapshot.connectionState == ConnectionState.waiting) {
+                  return const Scaffold(
+                    body: Center(
+                      child: CupertinoActivityIndicator(),
+                    ),
+                  );
+                }
+                if (userSnapshot.hasData &&
+                    userSnapshot.data != null &&
+                    userSnapshot.data!.isNotEmpty) {
+                  return const PillListPage();
+                } else {
+                  return const EditProfilePage();
+                }
+              });
         } else {
           if (showLoginPage) {
             return LoginPage(togglePage: togglePage);
