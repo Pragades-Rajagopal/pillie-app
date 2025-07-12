@@ -51,7 +51,9 @@ class _AuthGateState extends State<AuthGate> {
                     userSnapshot.data!.isNotEmpty) {
                   return const PillListPage();
                 } else {
-                  return const EditProfilePage();
+                  return EditProfilePage(
+                    userId: snapshot.data!.session!.user.id,
+                  );
                 }
               });
         } else {

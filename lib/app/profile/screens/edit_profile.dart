@@ -1,17 +1,29 @@
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:pillie/app/home/screens/pill_list_page.dart';
 import 'package:pillie/components/text_button.dart';
 import 'package:pillie/components/text_form_field.dart';
+import 'package:pillie/databases/user_database.dart';
+import 'package:pillie/models/user_model.dart';
+import 'package:pillie/utils/dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({super.key});
+  final String userId;
+  const EditProfilePage({
+    super.key,
+    required this.userId,
+  });
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
+  final db = UserDatabase();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _dobController = TextEditingController();
@@ -21,29 +33,80 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _medicationController = TextEditingController();
   final _medicalNotesController = TextEditingController();
   final _organDonorController = TextEditingController();
+  File? _imgFile;
+
+  Future pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      if (mounted) setState(() => _imgFile = File(image.path));
+    }
+  }
+
+  Future<String?> uploadImage() async {
+    final env = await parseDotEnv();
+    if (_imgFile == null) return null;
+    final currentTime = DateTime.now().millisecondsSinceEpoch.toString();
+    final fileName = '${widget.userId}_$currentTime';
+    final path = 'uploads/$fileName';
+    final imgPath = await Supabase.instance.client.storage
+        .from('user-profile-picture')
+        .upload(path, _imgFile!);
+    final imageUrl = '${env["SUPABASE_URL"]}/storage/v1/object/public/$imgPath';
+    return imageUrl;
+    // TODO: add snack bar for max file size
+  }
+
+  dynamic sanitizeInput(TextEditingController controller) =>
+      controller.text.isEmpty ? null : controller.text;
+
+  void editUser() async {
+    try {
+      // Check if text fields are not null
+      if (_formKey.currentState!.validate()) {
+        final imageUrl = await uploadImage();
+        await db.addUser(
+          UserModel(
+            name: _nameController.text,
+            img: imageUrl,
+            dob: sanitizeInput(_dobController),
+            height: _heightController.text.isNotEmpty
+                ? int.tryParse(sanitizeInput(_heightController).toString())
+                : null,
+            weight: _weightController.text.isNotEmpty
+                ? int.tryParse(sanitizeInput(_weightController).toString())
+                : null,
+            bloodGroup: sanitizeInput(_bloodGroupController),
+            medicalNotes: sanitizeInput(_medicalNotesController),
+            medications: sanitizeInput(_medicationController),
+            organDonor: sanitizeInput(_organDonorController),
+          ),
+        );
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const PillListPage(),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Something went wrong'),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          const SliverAppBar(
-            snap: true,
-            pinned: false,
-            floating: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                "Please take a moment to share us some information",
-                style: TextStyle(
-                  fontSize: 14.0,
-                  color: Colors.black,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              stretchModes: [StretchMode.fadeTitle],
-            ),
-            expandedHeight: 180,
-          ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(
               vertical: 30.0,
@@ -54,20 +117,37 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 key: _formKey,
                 child: Column(
                   children: [
+                    const SizedBox(height: 180),
+                    const Text(
+                      "Please take a moment to share us some information",
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        color: Colors.black,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 28),
                     Stack(
                       children: [
-                        CircleAvatar(
-                          radius: 100,
-                          backgroundColor: Colors.grey[400],
-                          child: const Icon(
-                            CupertinoIcons.profile_circled,
-                            size: 120,
-                            color: Colors.white,
-                          ),
-                        ),
+                        if (_imgFile != null) ...{
+                          CircleAvatar(
+                            radius: 100,
+                            backgroundImage: FileImage(_imgFile!),
+                          )
+                        } else ...{
+                          CircleAvatar(
+                            radius: 100,
+                            backgroundColor: Colors.grey[400],
+                            child: const Icon(
+                              CupertinoIcons.profile_circled,
+                              size: 120,
+                              color: Colors.white,
+                            ),
+                          )
+                        },
                         Positioned(
-                          bottom: 20,
-                          right: 20,
+                          bottom: 12,
+                          right: 12,
                           child: Container(
                             height: 42,
                             width: 42,
@@ -77,7 +157,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             child: IconButton(
                               icon: Icon(CupertinoIcons.pencil_circle_fill,
                                   color: Theme.of(context).colorScheme.surface),
-                              onPressed: () {},
+                              onPressed: pickImage,
                               iconSize: 40,
                               padding: const EdgeInsets.all(0),
                               constraints: const BoxConstraints(),
@@ -162,7 +242,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       textController: _organDonorController,
                     ),
                     const SizedBox(height: 14),
-                    AppTextButton(buttonText: 'Save', onTap: () {}),
+                    AppTextButton(buttonText: 'Save', onTap: editUser),
                     const SizedBox(height: 24),
                   ],
                 ),
