@@ -29,77 +29,76 @@ class PillCard extends StatelessWidget {
       swipeRightActionIcon: swipeRightActionIcon,
       swipeRightActionText: swipeRightActionText,
       onDismissedAction: onDismissedAction,
-      cardWidget: Card(
-        elevation: 0,
-        color: Theme.of(context).colorScheme.tertiary.withOpacity(0.2),
-        margin: const EdgeInsets.fromLTRB(0, 14, 0, 0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        shadowColor: Colors.transparent,
-        surfaceTintColor: Theme.of(context).colorScheme.surface,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${pill.brand}',
-                    style: TextStyle(
-                      fontSize:
-                          Theme.of(context).textTheme.bodyMedium?.fontSize,
-                      color: Theme.of(context).colorScheme.primary,
+      cardWidget: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Card(
+          elevation: 0,
+          color: Colors.lightGreen[100],
+          margin: const EdgeInsets.fromLTRB(0, 14, 0, 0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          shadowColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${pill.brand}',
+                      style: TextStyle(
+                        fontSize: 22,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    '${pill.name}',
-                    style: TextStyle(
-                      fontSize: Theme.of(context).textTheme.bodySmall?.fontSize,
-                      color: Theme.of(context).colorScheme.secondary,
+                    Text(
+                      '${pill.name}',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  timeIndicator(context, 'Day', pill.day!),
-                  const SizedBox(height: 4),
-                  timeIndicator(context, 'Noon', pill.noon!),
-                  const SizedBox(height: 4),
-                  timeIndicator(context, 'Night', pill.night!),
-                ],
-              ),
-              Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .tertiary
-                          .withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 18.0, vertical: 12.0),
-                      child: Text(
-                        '${pill.count}',
-                        style: const TextStyle(fontSize: 28.0),
+                  ],
+                ),
+                Column(
+                  children: [
+                    timeIndicator(context, 'Day', pill.day!),
+                    const SizedBox(height: 4),
+                    timeIndicator(context, 'Noon', pill.noon!),
+                    const SizedBox(height: 4),
+                    timeIndicator(context, 'Night', pill.night!),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.lightGreen[300],
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 18.0, vertical: 12.0),
+                        child: Text(
+                          '${pill.count}',
+                          style: const TextStyle(fontSize: 28.0),
+                        ),
                       ),
                     ),
-                  ),
-                  const Text(
-                    'left',
-                    style: TextStyle(fontSize: 12.0),
-                  ),
-                ],
-              ),
-            ],
+                    const Text(
+                      'left',
+                      style: TextStyle(fontSize: 12.0),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
