@@ -42,6 +42,7 @@ class PillDatabase {
           .eq("id", pillId)
           .eq("user_id", userId);
     } catch (e, stackTrace) {
+      print(stackTrace);
       throw Error.throwWithStackTrace(e, stackTrace);
     }
   }

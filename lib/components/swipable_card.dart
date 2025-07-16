@@ -21,7 +21,7 @@ class SwipableCard extends StatelessWidget {
       key: Key(uniqueKey),
       direction: DismissDirection.startToEnd,
       background: Container(
-        margin: const EdgeInsets.fromLTRB(0, 14, 0, 0),
+        margin: const EdgeInsets.fromLTRB(12, 14, 12, 0),
         decoration: ShapeDecoration(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),

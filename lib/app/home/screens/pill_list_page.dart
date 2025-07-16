@@ -111,14 +111,17 @@ class _PillListPageState extends State<PillListPage> {
                       ),
                     );
                   }
-                  final pills = pillSnapshot.data!;
+                  final pills = pillSnapshot.data!
+                      .where((pill) => pill.isArchived == false)
+                      .toList();
                   return SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (BuildContext pillListContext, int pillIndex) {
                         return GestureDetector(
                           onTap: () => showEditPillBottomSheet(
                               context, pills[pillIndex], user["uid"]),
-                          child: PillCard(pill: pills[pillIndex], pillType: ""),
+                          child: PillCard(
+                              pill: pills[pillIndex], pillType: "active"),
                         );
                       },
                       childCount: pills.length,
