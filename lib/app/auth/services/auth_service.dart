@@ -4,8 +4,10 @@ class AuthService {
   final SupabaseClient _supabaseClient = Supabase.instance.client;
 
   Future<AuthResponse> signIn(String email, String password) async {
-    return await _supabaseClient.auth
-        .signInWithPassword(password: password, email: email);
+    return await _supabaseClient.auth.signInWithPassword(
+      password: password,
+      email: email,
+    );
   }
 
   Future<AuthResponse> signUp(String email, String password) async {
@@ -19,9 +21,6 @@ class AuthService {
   Map<String, dynamic>? getCurrentUser() {
     final session = _supabaseClient.auth.currentSession;
     final user = session?.user;
-    return {
-      "email": user?.email,
-      "uid": user?.id,
-    };
+    return {"email": user?.email, "uid": user?.id};
   }
 }

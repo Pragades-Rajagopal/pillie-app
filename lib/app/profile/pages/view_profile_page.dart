@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:pillie/app/profile/pages/edit_profile_page.dart';
+import 'package:pillie/components/text_link.dart';
+import 'package:pillie/models/user_model.dart';
 import 'package:pillie/utils/helper_functions.dart';
 
 class ViewProfilePage extends StatefulWidget {
-  final Map<String, dynamic> userProfileInfo;
-  const ViewProfilePage({
-    super.key,
-    required this.userProfileInfo,
-  });
+  final UserModel userProfileInfo;
+  const ViewProfilePage({super.key, required this.userProfileInfo});
 
   @override
   State<ViewProfilePage> createState() => _ViewProfilePageState();
@@ -20,9 +20,7 @@ class _ViewProfilePageState extends State<ViewProfilePage> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            snap: false,
-            pinned: false,
-            floating: false,
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: false,
               titlePadding: const EdgeInsets.all(18),
@@ -36,7 +34,7 @@ class _ViewProfilePageState extends State<ViewProfilePage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          '${userInfo["name"]}',
+                          '${userInfo.name}',
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 14.0,
@@ -47,14 +45,9 @@ class _ViewProfilePageState extends State<ViewProfilePage> {
                     ),
                   ),
                   CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      '${userInfo["img"]}',
-                    ),
+                    backgroundImage: NetworkImage('${userInfo.img}'),
                   ),
                 ],
-              ),
-              background: Container(
-                color: Colors.lightGreen[200],
               ),
               stretchModes: const [StretchMode.fadeTitle],
             ),
@@ -69,26 +62,40 @@ class _ViewProfilePageState extends State<ViewProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  dataElement('Blood Group', userInfo["bloodGroup"]),
+                  dataElement('Blood Group', userInfo.bloodGroup),
                   dataElement(
-                      'DOB',
-                      userInfo["dob"] != null
-                          ? convertDateFormat(userInfo["dob"].toString(),
-                              format: 'dmy', separator: '-')
-                          : ''),
+                    'DOB',
+                    userInfo.dob != null
+                        ? convertDateFormat(
+                            userInfo.dob.toString(),
+                            format: 'dmy',
+                            separator: '-',
+                          )
+                        : '',
+                  ),
                   dataElement(
-                      'Height',
-                      userInfo["height"] != null
-                          ? userInfo["height"].toString()
-                          : ''),
+                    'Height',
+                    userInfo.height != null ? userInfo.height.toString() : '',
+                  ),
                   dataElement(
-                      'Weight',
-                      userInfo["weight"] != null
-                          ? userInfo["weight"].toString()
-                          : ''),
-                  dataElement('Medications', userInfo["medications"]),
-                  dataElement('Medical Notes', userInfo["medicalNotes"]),
-                  dataElement('Organ Donor', userInfo["organDonor"]),
+                    'Weight',
+                    userInfo.weight != null ? userInfo.weight.toString() : '',
+                  ),
+                  dataElement('Medications', userInfo.medications),
+                  dataElement('Medical Notes', userInfo.medicalNotes),
+                  dataElement('Organ Donor', userInfo.organDonor),
+                  const SizedBox(height: 20),
+                  AppTextLink(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => EditProfilePage(
+                          userId: userInfo.id!,
+                          route: "/profile",
+                        ),
+                      ),
+                    ),
+                    linkText: 'Edit Profile',
+                  ),
                 ],
               ),
             ),
@@ -99,23 +106,14 @@ class _ViewProfilePageState extends State<ViewProfilePage> {
   }
 
   Widget dataElement(String header, String? value) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            header,
-            style: TextStyle(
-              fontSize: 16.0,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-          ),
-          Text(
-            value == null || value.isEmpty ? '-' : value,
-            style: TextStyle(
-              fontSize: 24.0,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          const SizedBox(height: 12),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(header, style: TextStyle(fontSize: 20.0, color: Colors.grey[600])),
+      Text(
+        value == null || value.isEmpty ? '-' : value,
+        style: TextStyle(fontSize: 28.0, color: Colors.black),
+      ),
+      const SizedBox(height: 12),
+    ],
+  );
 }

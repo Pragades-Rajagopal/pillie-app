@@ -1,8 +1,9 @@
 import 'package:flutter/services.dart';
 
 /// Parses the .env file
-Future<Map<String, String>> parseDotEnv(
-    {String assetsFileName = '.env'}) async {
+Future<Map<String, String>> parseDotEnv({
+  String assetsFileName = '.env',
+}) async {
   final lines = await rootBundle.loadString(assetsFileName);
   Map<String, String> envVariables = {};
   for (String line in lines.split('\n')) {

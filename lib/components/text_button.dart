@@ -21,9 +21,7 @@ class AppTextButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12.0),
         decoration: BoxDecoration(
           color: buttonColor ?? Colors.lightBlue,
-          borderRadius: const BorderRadius.all(
-            Radius.circular(8.0),
-          ),
+          borderRadius: const BorderRadius.all(Radius.circular(8.0)),
         ),
         child: Center(
           child: Text(

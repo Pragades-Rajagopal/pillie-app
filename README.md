@@ -1,23 +1,16 @@
-# Pillie
+# pillie
 
-A cross platform mobile application to track pills/drugs and collaborate with other patients
-
-## Prerequisites
-
-- Flutter v3.24.3
-- Dart v3.5.3
-- DevTools v2.37.3
+A new Flutter project.
 
 ## Getting Started
 
-Copy the environment variable from [sample env](.env.sample) file to paste it to a newly created .env file
+This project is a starting point for a Flutter application.
 
-## Commands
+A few resources to get you started if this is your first Flutter project:
 
-```bash
-$ flutter emulators
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-$ flutter emulators --launch apple_ios_simulator
-
-$ flutter run
-```
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

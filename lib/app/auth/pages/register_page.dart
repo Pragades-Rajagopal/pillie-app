@@ -3,13 +3,11 @@ import 'package:pillie/app/auth/services/auth_service.dart';
 import 'package:pillie/components/text_button.dart';
 import 'package:pillie/components/text_form_field.dart';
 import 'package:pillie/components/text_link.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
 
 class RegisterPage extends StatefulWidget {
   final Function() togglePage;
-  const RegisterPage({
-    super.key,
-    required this.togglePage,
-  });
+  const RegisterPage({super.key, required this.togglePage});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -29,25 +27,26 @@ class _RegisterPageState extends State<RegisterPage> {
     final confirmPassword = _confirmPasswordController.text;
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password do not match'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Password do not match')));
       return;
     }
-
     try {
       if (_formKey.currentState!.validate()) {
         await authService.signUp(email, password);
       }
+    } on AuthException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
+      }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Something went wrong'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Something went wrong')));
       }
     }
   }

@@ -3,13 +3,11 @@ import 'package:pillie/app/auth/services/auth_service.dart';
 import 'package:pillie/components/text_button.dart';
 import 'package:pillie/components/text_form_field.dart';
 import 'package:pillie/components/text_link.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
 
 class LoginPage extends StatefulWidget {
   final Function() togglePage;
-  const LoginPage({
-    super.key,
-    required this.togglePage,
-  });
+  const LoginPage({super.key, required this.togglePage});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -30,13 +28,17 @@ class _LoginPageState extends State<LoginPage> {
       if (_formKey.currentState!.validate()) {
         await authService.signIn(email, password);
       }
+    } on AuthException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
+      }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Something went wrong'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Something went wrong')));
       }
     }
   }

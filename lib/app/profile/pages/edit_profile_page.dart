@@ -2,31 +2,53 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:image_picker/image_picker.dart';
-import 'package:pillie/app/home/screens/pill_list_page.dart';
+import 'package:pillie/app/pill/pages/pill_list_page.dart';
 import 'package:pillie/components/text_button.dart';
 import 'package:pillie/components/text_form_field.dart';
-import 'package:pillie/databases/user_database.dart';
+import 'package:pillie/app/user/services/user_service.dart';
 import 'package:pillie/models/user_model.dart';
 import 'package:pillie/utils/dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+// Custom input formatter for DD/MM/YYYY
+class _DobInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    var text = newValue.text.replaceAll("/", "");
+    final buffer = StringBuffer();
+    for (int i = 0; i < text.length && i < 8; i++) {
+      buffer.write(text[i]);
+      if ((i == 1 || i == 3) && i != text.length - 1) {
+        buffer.write('/');
+      }
+    }
+    return TextEditingValue(
+      text: buffer.toString(),
+      selection: TextSelection.collapsed(offset: buffer.length),
+    );
+  }
+}
+
 class EditProfilePage extends StatefulWidget {
   final String userId;
-  const EditProfilePage({
-    super.key,
-    required this.userId,
-  });
+  final String? route;
+  const EditProfilePage({super.key, required this.userId, this.route = "/"});
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final db = UserDatabase();
+  final db = UserService();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _dobController = TextEditingController();
+  final _dobInputFormatter = _DobInputFormatter();
   final _bloodGroupController = TextEditingController();
   final _heightController = TextEditingController();
   final _weightController = TextEditingController();
@@ -85,19 +107,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
         if (mounted) {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const PillListPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const PillListPage()),
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Something went wrong'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Something went wrong')));
       }
     }
   }
@@ -107,6 +125,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
+          if (widget.route != "/")
+            SliverAppBar(
+              pinned: false,
+              expandedHeight: 60,
+              // backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+              flexibleSpace: const FlexibleSpaceBar(
+                title: Text('Edit Profile', style: TextStyle(fontSize: 16)),
+                centerTitle: true,
+                // titlePadding: EdgeInsets.only(left: 18, bottom: 16),
+              ),
+            ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(
               vertical: 30.0,
@@ -117,33 +146,32 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    const SizedBox(height: 180),
-                    const Text(
-                      "Please take a moment to share us some information",
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        color: Colors.black,
+                    if (widget.route == "/") ...{
+                      const SizedBox(height: 180),
+                      const Text(
+                        "Please take a moment to share us some information",
+                        style: TextStyle(fontSize: 18.0, color: Colors.black),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 28),
+                      const SizedBox(height: 28),
+                    },
                     Stack(
                       children: [
                         if (_imgFile != null) ...{
                           CircleAvatar(
-                            radius: 100,
+                            radius: 80,
                             backgroundImage: FileImage(_imgFile!),
-                          )
+                          ),
                         } else ...{
                           CircleAvatar(
-                            radius: 100,
+                            radius: 80,
                             backgroundColor: Colors.grey[400],
                             child: const Icon(
                               CupertinoIcons.profile_circled,
-                              size: 120,
+                              size: 80,
                               color: Colors.white,
                             ),
-                          )
+                          ),
                         },
                         Positioned(
                           bottom: 12,
@@ -152,11 +180,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             height: 42,
                             width: 42,
                             decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary,
-                                borderRadius: BorderRadius.circular(30)),
+                              color: Theme.of(context).colorScheme.primary,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
                             child: IconButton(
-                              icon: Icon(CupertinoIcons.pencil_circle_fill,
-                                  color: Theme.of(context).colorScheme.surface),
+                              icon: Icon(
+                                CupertinoIcons.pencil_circle,
+                                color: Colors.black,
+                              ),
                               onPressed: pickImage,
                               iconSize: 40,
                               padding: const EdgeInsets.all(0),
@@ -181,9 +212,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     AppTextFormField(
                       labelText: 'DOB (DD/MM/YYYY)',
                       textController: _dobController,
+                      inputFormatters: [_dobInputFormatter],
                       validator: (value) {
                         if (value!.isNotEmpty && value.length != 10) {
                           return "Enter in DD/MM/YYYY format";
+                          // Custom input formatter for DD/MM/YYYY
                         }
                         return null;
                       },
@@ -209,7 +242,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             textController: _heightController,
                             keyboardType: TextInputType.number,
                             inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
+                              FilteringTextInputFormatter.digitsOnly,
                             ],
                           ),
                         ),
@@ -220,7 +253,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             textController: _weightController,
                             keyboardType: TextInputType.number,
                             inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
+                              FilteringTextInputFormatter.digitsOnly,
                             ],
                           ),
                         ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pillie/app/auth/screens/auth_gate.dart';
+import 'package:pillie/app/auth/auth_gate.dart';
 import 'package:pillie/clients/supabase_init.dart';
 
 void main() async {
@@ -13,9 +13,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AuthGate(),
+      theme: ThemeData(
+        colorScheme: ColorScheme.light(
+          surface: Colors.white,
+          primary: Colors.white,
+          secondary: Colors.grey[700]!,
+          tertiary: Colors.grey[500]!,
+          surfaceContainer: Colors.lightBlue[100]!,
+        ),
+      ),
+      home: const AuthGate(),
     );
   }
 }

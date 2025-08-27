@@ -25,9 +25,7 @@ class AppTextFormField extends StatelessWidget {
     return TextFormField(
       controller: textController,
       validator: validator,
-      style: const TextStyle(
-        fontSize: 22,
-      ),
+      style: const TextStyle(fontSize: 22),
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: TextStyle(
@@ -37,7 +35,7 @@ class AppTextFormField extends StatelessWidget {
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
             color: Theme.of(context).colorScheme.tertiary,
-            width: 2.0,
+            width: 1.0,
           ),
           borderRadius: const BorderRadius.all(Radius.circular(8.0)),
           gapPadding: 10,
@@ -45,22 +43,16 @@ class AppTextFormField extends StatelessWidget {
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(
             color: Theme.of(context).colorScheme.tertiary,
-            width: 2.0,
+            width: 1.0,
           ),
           borderRadius: const BorderRadius.all(Radius.circular(8.0)),
         ),
         errorBorder: const OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.red,
-            width: 2.0,
-          ),
+          borderSide: BorderSide(color: Colors.red, width: 2.0),
           borderRadius: BorderRadius.all(Radius.circular(8.0)),
         ),
         focusedErrorBorder: const OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.red,
-            width: 2.0,
-          ),
+          borderSide: BorderSide(color: Colors.red, width: 2.0),
           borderRadius: BorderRadius.all(Radius.circular(8.0)),
         ),
         errorStyle: TextStyle(
