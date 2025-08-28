@@ -66,7 +66,7 @@ class AppTextFormField extends StatelessWidget {
         focusColor: Theme.of(context).colorScheme.secondary,
         counterText: "",
       ),
-      cursorColor: Theme.of(context).colorScheme.primary,
+      cursorColor: Colors.black,
       obscureText: obscureText ?? false,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,

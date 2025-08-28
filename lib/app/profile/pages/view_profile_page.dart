@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pillie/app/profile/pages/edit_profile_page.dart';
 import 'package:pillie/components/text_link.dart';
 import 'package:pillie/models/user_model.dart';
+import 'package:pillie/app/user/services/user_service.dart';
 import 'package:pillie/utils/helper_functions.dart';
 
 class ViewProfilePage extends StatefulWidget {
@@ -13,9 +14,27 @@ class ViewProfilePage extends StatefulWidget {
 }
 
 class _ViewProfilePageState extends State<ViewProfilePage> {
+  UserModel? _userInfo;
+  final UserService _userService = UserService();
+
+  @override
+  void initState() {
+    super.initState();
+    _userInfo = widget.userProfileInfo;
+  }
+
+  Future<void> _refreshUserInfo() async {
+    final userInfoList = await _userService.getUser(_userInfo?.id ?? "");
+    if (userInfoList != null && userInfoList.isNotEmpty) {
+      setState(() {
+        _userInfo = UserModel.fromMap(userInfoList[0]);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final userInfo = widget.userProfileInfo;
+    final userInfo = _userInfo;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -34,7 +53,7 @@ class _ViewProfilePageState extends State<ViewProfilePage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          '${userInfo.name}',
+                          userInfo?.name ?? '-',
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 14.0,
@@ -44,9 +63,17 @@ class _ViewProfilePageState extends State<ViewProfilePage> {
                       ],
                     ),
                   ),
-                  CircleAvatar(
-                    backgroundImage: NetworkImage('${userInfo.img}'),
-                  ),
+                  if (userInfo?.img != null && userInfo!.img!.isNotEmpty) ...{
+                    CircleAvatar(
+                      backgroundImage: NetworkImage('${userInfo.img}'),
+                    ),
+                  } else ...{
+                    const CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.white,
+                      child: Icon(Icons.person, size: 32, color: Colors.blue),
+                    ),
+                  },
                 ],
               ),
               stretchModes: const [StretchMode.fadeTitle],
@@ -62,12 +89,12 @@ class _ViewProfilePageState extends State<ViewProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  dataElement('Blood Group', userInfo.bloodGroup),
+                  dataElement('Blood Group', userInfo?.bloodGroup),
                   dataElement(
                     'DOB',
-                    userInfo.dob != null
+                    userInfo?.dob != null
                         ? convertDateFormat(
-                            userInfo.dob.toString(),
+                            userInfo!.dob.toString(),
                             format: 'dmy',
                             separator: '-',
                           )
@@ -75,25 +102,30 @@ class _ViewProfilePageState extends State<ViewProfilePage> {
                   ),
                   dataElement(
                     'Height',
-                    userInfo.height != null ? userInfo.height.toString() : '',
+                    userInfo?.height != null ? userInfo!.height.toString() : '',
                   ),
                   dataElement(
                     'Weight',
-                    userInfo.weight != null ? userInfo.weight.toString() : '',
+                    userInfo?.weight != null ? userInfo!.weight.toString() : '',
                   ),
-                  dataElement('Medications', userInfo.medications),
-                  dataElement('Medical Notes', userInfo.medicalNotes),
-                  dataElement('Organ Donor', userInfo.organDonor),
+                  dataElement('Medications', userInfo?.medications),
+                  dataElement('Medical Notes', userInfo?.medicalNotes),
+                  dataElement('Organ Donor', userInfo?.organDonor),
                   const SizedBox(height: 20),
                   AppTextLink(
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => EditProfilePage(
-                          userId: userInfo.id!,
-                          route: "/profile",
+                    onTap: () async {
+                      final result = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => EditProfilePage(
+                            userId: userInfo?.id ?? '',
+                            route: "/profile",
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                      if (result == true) {
+                        await _refreshUserInfo();
+                      }
+                    },
                     linkText: 'Edit Profile',
                   ),
                 ],

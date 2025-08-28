@@ -14,17 +14,9 @@ class UserService {
     }
   }
 
-  Future addUser(UserModel user) async {
+  Future upsertUser(UserModel user) async {
     try {
-      await userClient.insert(user.toMap());
-    } catch (e, stackTrace) {
-      throw Error.throwWithStackTrace(e, stackTrace);
-    }
-  }
-
-  Future updateUser(UserModel data, String userId) async {
-    try {
-      await userClient.update(data.toMap()).eq('id', userId);
+      await userClient.upsert(user.toMap());
     } catch (e, stackTrace) {
       throw Error.throwWithStackTrace(e, stackTrace);
     }

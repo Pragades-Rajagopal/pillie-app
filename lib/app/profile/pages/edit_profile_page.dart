@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:image_picker/image_picker.dart';
-import 'package:pillie/app/pill/pages/pill_list_page.dart';
+import 'package:pillie/components/drop_down_field.dart';
 import 'package:pillie/components/text_button.dart';
 import 'package:pillie/components/text_form_field.dart';
 import 'package:pillie/app/user/services/user_service.dart';
 import 'package:pillie/models/user_model.dart';
 import 'package:pillie/utils/dotenv.dart';
+import 'package:pillie/utils/helper_functions.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Custom input formatter for DD/MM/YYYY
@@ -44,7 +45,7 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final db = UserService();
+  final UserService userService = UserService();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _dobController = TextEditingController();
@@ -55,7 +56,46 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _medicationController = TextEditingController();
   final _medicalNotesController = TextEditingController();
   final _organDonorController = TextEditingController();
+  String _imgUrl = "";
   File? _imgFile;
+
+  // if the route is not "/", then load existing user data
+  @override
+  void initState() {
+    super.initState();
+    if (widget.route != "/") {
+      _loadUserData();
+    }
+  }
+
+  void _loadUserData() async {
+    final userInfo = await userService.getUser(widget.userId);
+    if (userInfo != null && userInfo.isNotEmpty) {
+      final user = UserModel.fromMap(userInfo[0]);
+      setState(() {
+        _nameController.text = user.name ?? '';
+        _dobController.text = convertDateFormat(
+          user.dob!,
+          format: 'dmy',
+          separator: '-',
+        );
+        _bloodGroupController.text = user.bloodGroup ?? '';
+        _heightController.text = user.height != null
+            ? user.height.toString()
+            : '';
+        _weightController.text = user.weight != null
+            ? user.weight.toString()
+            : '';
+        _medicationController.text = user.medications ?? '';
+        _medicalNotesController.text = user.medicalNotes ?? '';
+        _organDonorController.text = user.organDonor ?? '';
+        // Load image from URL if available
+        if (user.img != null && user.img!.isNotEmpty) {
+          _imgUrl = user.img!;
+        }
+      });
+    }
+  }
 
   Future pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -87,10 +127,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
       // Check if text fields are not null
       if (_formKey.currentState!.validate()) {
         final imageUrl = await uploadImage();
-        await db.addUser(
+        await userService.upsertUser(
           UserModel(
             name: _nameController.text,
-            img: imageUrl,
+            img: imageUrl ?? _imgUrl,
             dob: sanitizeInput(_dobController),
             height: _heightController.text.isNotEmpty
                 ? int.tryParse(sanitizeInput(_heightController).toString())
@@ -105,13 +145,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
         );
         if (mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const PillListPage()),
-          );
+          Navigator.of(context).pop(true);
         }
       }
     } catch (e) {
+      print(e);
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -161,6 +199,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           CircleAvatar(
                             radius: 80,
                             backgroundImage: FileImage(_imgFile!),
+                          ),
+                        } else if (_imgUrl.isNotEmpty) ...{
+                          CircleAvatar(
+                            radius: 80,
+                            backgroundImage: NetworkImage(_imgUrl),
                           ),
                         } else ...{
                           CircleAvatar(
@@ -222,15 +265,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    AppTextFormField(
-                      labelText: 'Blood Group',
-                      textController: _bloodGroupController,
-                      validator: (value) {
-                        if (value!.isNotEmpty && value.length <= 1) {
-                          return "Enter the appropriate blood group";
-                        }
-                        return null;
-                      },
+                    // AppTextFormField(
+                    //   labelText: 'Blood Group',
+                    //   textController: _bloodGroupController,
+                    //   validator: (value) {
+                    //     if (value!.isNotEmpty && value.length <= 1) {
+                    //       return "Enter the appropriate blood group";
+                    //     }
+                    //     return null;
+                    //   },
+                    // ),
+                    AppDropDownField(
+                      items: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+                      controller: _bloodGroupController,
+                      label: 'Blood Group',
                     ),
                     const SizedBox(height: 16),
                     Row(
