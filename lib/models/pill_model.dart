@@ -35,7 +35,7 @@ class PillModel {
     return PillModel(
       id: map["id"] as String,
       name: map["name"] as String,
-      brand: map["brand"] as String,
+      brand: sanitizeValue<String>(map["brand"]),
       userId: map["user_id"] as String,
       count: sanitizeValue<dynamic>(map["count"]),
       day: map["day"] as bool,

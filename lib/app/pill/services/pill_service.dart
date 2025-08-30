@@ -1,10 +1,10 @@
 import 'package:pillie/models/pill_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class PillDatabase {
+class PillService {
   String userId;
 
-  PillDatabase(this.userId);
+  PillService(this.userId);
 
   final SupabaseQueryBuilder database = Supabase.instance.client.from(
     'pills_inventory',
