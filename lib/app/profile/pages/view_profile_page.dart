@@ -40,45 +40,40 @@ class _ViewProfilePageState extends State<ViewProfilePage> {
         slivers: [
           SliverAppBar(
             backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+            expandedHeight: userInfo?.img != null && userInfo!.img!.isNotEmpty
+                ? 360
+                : 60,
             flexibleSpace: FlexibleSpaceBar(
-              centerTitle: false,
-              titlePadding: const EdgeInsets.all(18),
-              title: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          userInfo?.name ?? '-',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14.0,
-                          ),
-                          overflow: TextOverflow.fade,
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (userInfo?.img != null && userInfo!.img!.isNotEmpty) ...{
-                    CircleAvatar(
-                      backgroundImage: NetworkImage('${userInfo.img}'),
-                    ),
-                  } else ...{
-                    const CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.person, size: 32, color: Colors.blue),
-                    ),
-                  },
-                ],
+              centerTitle: true,
+              titlePadding: const EdgeInsets.only(bottom: 16),
+              title: Text(
+                userInfo?.name ?? '-',
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
               ),
+              background: userInfo?.img != null && userInfo!.img!.isNotEmpty
+                  ? Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          width: 60.0,
+                        ),
+                        image: DecorationImage(
+                          image: NetworkImage(userInfo.img!),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      color: Theme.of(context).colorScheme.surfaceContainer,
+                    ),
               stretchModes: const [StretchMode.fadeTitle],
             ),
-            expandedHeight: 120,
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(

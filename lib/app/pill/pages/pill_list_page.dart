@@ -4,6 +4,7 @@ import 'package:pillie/app/profile/pages/view_profile_page.dart';
 import 'package:pillie/app/user/services/user_service.dart';
 import 'package:pillie/components/common_components.dart';
 import 'package:pillie/components/pill_card.dart';
+import 'package:pillie/components/text_link.dart';
 import 'package:pillie/models/user_model.dart';
 import 'package:pillie/app/pill/services/pill_service.dart';
 import 'package:pillie/models/pill_model.dart';
@@ -21,6 +22,7 @@ class _PillListPageState extends State<PillListPage> {
   AuthService authService = AuthService();
   PillService? pillService;
   UserModel? user;
+  bool showArchived = false;
 
   @override
   void initState() {
@@ -136,15 +138,51 @@ class _PillListPageState extends State<PillListPage> {
                         );
                       }
                       print(snapshot.error);
-                      final pills = snapshot.data ?? [];
+                      // filter out unarchived pills
+                      final pills = (snapshot.data ?? [])
+                          .where((pill) => pill.isArchived == showArchived)
+                          .toList();
                       if (pills.isEmpty) {
-                        return const SliverToBoxAdapter(
-                          child: Center(child: Text('No pills found.')),
+                        return SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text('No pills found'),
+                                const SizedBox(height: 24),
+                                AppTextLink(
+                                  linkText: showArchived
+                                      ? 'Show Active Pills'
+                                      : 'View Archived Pills',
+                                  onTap: () {
+                                    setState(() {
+                                      showArchived = !showArchived;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                         );
                       }
                       return SliverList(
                         delegate: SliverChildListDelegate([
                           PillCard(pills: pills, pillService: pillService),
+                          const SizedBox(height: 16),
+                          Center(
+                            child: AppTextLink(
+                              linkText: showArchived
+                                  ? 'Show Active Pills'
+                                  : 'View Archived Pills',
+                              onTap: () {
+                                setState(() {
+                                  showArchived = !showArchived;
+                                });
+                              },
+                            ),
+                          ),
                         ]),
                       );
                     },

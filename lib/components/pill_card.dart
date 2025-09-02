@@ -40,6 +40,7 @@ class PillCard extends StatelessWidget {
               if (pill.night == true) 2,
             },
             isEdit: true,
+            isArchived: pill.isArchived!,
           ),
           child: Container(
             decoration: BoxDecoration(

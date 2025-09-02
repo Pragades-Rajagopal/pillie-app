@@ -17,6 +17,7 @@ class CommonComponents {
     String? count,
     Set<int>? selectedTime,
     bool isEdit = false,
+    bool isArchived = false,
   }) {
     return showModalBottomSheet(
       context: context,
@@ -176,6 +177,32 @@ class CommonComponents {
                     ),
                     if (isEdit) ...{
                       const SizedBox(height: 12),
+                      AppTextButton(
+                        onTap: () async {
+                          if (isEdit && pillId != null) {
+                            if (isArchived == false) {
+                              await pillService?.archiveRestorePill(
+                                pillId,
+                                true,
+                              );
+                            } else {
+                              await pillService?.archiveRestorePill(
+                                pillId,
+                                false,
+                              );
+                            }
+                          }
+                          if (context.mounted) Navigator.of(context).pop();
+                        },
+                        buttonText: isArchived
+                            ? "Restore Pill"
+                            : "Archive Pill",
+                        buttonColor: Colors.grey[300],
+                        textColor: Colors.black,
+                      ),
+                    },
+                    if (isEdit) ...{
+                      const SizedBox(height: 20),
                       AppTextButton(
                         onTap: () async {
                           if (isEdit && pillId != null) {

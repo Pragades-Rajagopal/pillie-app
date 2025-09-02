@@ -35,25 +35,14 @@ class PillService {
         (data) => data.map((pillMap) => PillModel.fromMap(pillMap)).toList(),
       );
 
-  Future archivePill(String pillId) async {
+  Future archiveRestorePill(String pillId, bool flag) async {
     try {
       await database
-          .update({"is_archived": true})
+          .update({"is_archived": flag})
           .eq("id", pillId)
           .eq("user_id", userId);
     } catch (e, stackTrace) {
       print(stackTrace);
-      throw Error.throwWithStackTrace(e, stackTrace);
-    }
-  }
-
-  Future restorePill(String pillId) async {
-    try {
-      await database
-          .update({"is_archived": false})
-          .eq("id", pillId)
-          .eq("user_id", userId);
-    } catch (e, stackTrace) {
       throw Error.throwWithStackTrace(e, stackTrace);
     }
   }
