@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:image_picker/image_picker.dart';
+import 'package:pillie/app/profile/pages/set_date_page.dart';
 import 'package:pillie/components/drop_down_field.dart';
 import 'package:pillie/components/text_button.dart';
 import 'package:pillie/components/text_form_field.dart';
@@ -144,8 +145,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
             organDonor: sanitizeInput(_organDonorController),
           ),
         );
-        if (mounted) {
+        if (mounted && widget.route != "/") {
           Navigator.of(context).pop(true);
+        } else if (mounted && widget.route == "/") {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => SetDatePage(userId: widget.userId),
+            ),
+          );
         }
       }
     } catch (e) {

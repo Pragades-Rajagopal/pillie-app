@@ -7,6 +7,7 @@ class UserModel {
   int? height;
   int? weight;
   String? dob;
+  int? resetDays;
   String? bloodGroup;
   String? medications;
   String? medicalNotes;
@@ -21,6 +22,7 @@ class UserModel {
     this.height,
     this.weight,
     this.dob,
+    this.resetDays,
     this.bloodGroup,
     this.medications,
     this.medicalNotes,
@@ -37,6 +39,7 @@ class UserModel {
       height: sanitizeValue<dynamic>(map["height"]),
       weight: sanitizeValue<dynamic>(map["weight"]),
       dob: sanitizeValue<String>(map["dob"]),
+      resetDays: sanitizeValue<dynamic>(map["reset_days"]),
       bloodGroup: sanitizeValue<String>(map["blood_group"]),
       medications: sanitizeValue<String>(map["medications"]),
       medicalNotes: sanitizeValue<String>(map["medical_notes"]),
@@ -57,6 +60,7 @@ class UserModel {
       "medications": medications,
       "medical_notes": medicalNotes,
       "organ_donor": organDonor,
+      "reset_days": resetDays,
     };
   }
 }

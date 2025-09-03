@@ -21,4 +21,12 @@ class UserService {
       throw Error.throwWithStackTrace(e, stackTrace);
     }
   }
+
+  Future updateResetDays(String userId, int resetDays) async {
+    try {
+      await userClient.update({'reset_days': resetDays}).eq('id', userId);
+    } catch (e, stackTrace) {
+      throw Error.throwWithStackTrace(e, stackTrace);
+    }
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pillie/app/auth/services/auth_service.dart';
 import 'package:pillie/app/profile/pages/edit_profile_page.dart';
 import 'package:pillie/components/text_link.dart';
 import 'package:pillie/models/user_model.dart';
@@ -123,6 +124,17 @@ class _ViewProfilePageState extends State<ViewProfilePage> {
                     },
                     linkText: 'Edit Profile',
                   ),
+                  const SizedBox(height: 20),
+                  AppTextLink(
+                    onTap: () async {
+                      await AuthService().signOut();
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    linkText: 'Sign Out',
+                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
