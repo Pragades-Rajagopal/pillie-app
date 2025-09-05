@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:pillie/app/auth/auth_gate.dart';
 import 'package:pillie/clients/supabase_init.dart';
+import 'package:pillie/utils/cron/cron.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await init();
+  // Initialize cron jobs
+  initCronJobs();
   runApp(const MyApp());
 }
 

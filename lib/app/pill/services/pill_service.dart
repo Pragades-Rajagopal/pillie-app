@@ -35,6 +35,19 @@ class PillService {
         (data) => data.map((pillMap) => PillModel.fromMap(pillMap)).toList(),
       );
 
+  Future<List<PillModel>> getAllPills() async {
+    try {
+      final response = await database
+          .select()
+          .eq('user_id', userId)
+          .eq('is_archived', false)
+          .order('count', ascending: true);
+      return response.map((pillMap) => PillModel.fromMap(pillMap)).toList();
+    } catch (e, stackTrace) {
+      throw Error.throwWithStackTrace(e, stackTrace);
+    }
+  }
+
   Future archiveRestorePill(String pillId, bool flag) async {
     try {
       await database

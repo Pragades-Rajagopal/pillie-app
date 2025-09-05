@@ -5,6 +5,7 @@ import 'package:pillie/app/auth/pages/register_page.dart';
 import 'package:pillie/app/pill/pages/pill_list_page.dart';
 import 'package:pillie/app/profile/pages/edit_profile_page.dart';
 import 'package:pillie/app/user/services/user_service.dart';
+import 'package:pillie/utils/cron/cron.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthGate extends StatefulWidget {

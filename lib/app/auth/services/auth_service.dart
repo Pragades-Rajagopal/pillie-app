@@ -1,3 +1,4 @@
+import 'package:pillie/utils/cron/cron.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
@@ -15,6 +16,8 @@ class AuthService {
   }
 
   Future<void> signOut() async {
+    // Stop all cron jobs on sign out
+    stopAllCronJobs();
     return await _supabaseClient.auth.signOut();
   }
 
